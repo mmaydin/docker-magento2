@@ -40,14 +40,11 @@ RUN { \
     } | debconf-set-selections \
     && apt-get install -y mysql-server mysql-client && rm -rf /var/lib/apt/lists/*
 
-RUN usermod -d /var/lib/mysql/ mysql
 ADD ./conf/bind_0.cnf /etc/mysql/conf.d/bind_0.cnf
 
 RUN mkdir -p /opt/mysql
 ADD ./bin/run-mysql.sh /opt/mysql/run-mysql.sh
 RUN chmod 755 /opt/mysql/run-mysql.sh
-
-VOLUME ["/var/lib/mysql"]
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php && \
@@ -57,6 +54,7 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 ADD ./conf/auth.json /root/.composer/auth.json
 
 #Define the ENV variable
+ENV MAGENTO_BASE_URL http://magento2.local
 ENV nginx_vhost /etc/nginx/sites-available/default
 ENV php_conf /etc/php/7.0/fpm/php.ini
 ENV nginx_conf /etc/nginx/nginx.conf
@@ -74,13 +72,13 @@ COPY ./conf/supervisord.conf ${supervisor_conf}
 RUN mkdir -p /run/php && \
     chown -R www-data:www-data /var/www/html && \
     chown -R www-data:www-data /run/php
- 
-# Volume configuration
-VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html"]
- 
+
 # Configure Services and Port
 COPY ./bin/start.sh /start.sh
 COPY ./bin/magento2-start.sh /usr/local/bin/magento2-start.sh
 CMD ["./start.sh"]
- 
+
 EXPOSE 80 443 3306
+
+# Volume configuration
+VOLUME ["/var/lib/mysql", "/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html"]

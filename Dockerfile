@@ -54,7 +54,6 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 ADD ./conf/auth.json /root/.composer/auth.json
 
 #Define the ENV variable
-ENV MAGENTO_BASE_URL http://magento2.local
 ENV nginx_vhost /etc/nginx/sites-available/default
 ENV php_conf /etc/php/7.0/fpm/php.ini
 ENV nginx_conf /etc/nginx/nginx.conf

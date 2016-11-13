@@ -2,9 +2,12 @@
 echo "Initializing setup..."
 cd /var/www/html
 if [ -f ./app/etc/config.php ] || [ -f ./app/etc/env.php ]; then
+    if ! [[ "$MAGENTO_BASE_URL" =~ '/'$ ]]; then
+        echo "Found this url $MAGENTO_BASE_URL but it is not valid so we change to $MAGENTO_BASE_URL/"
+        MAGENTO_BASE_URL="$MAGENTO_BASE_URL/"
+    fi
     echo "Update Magento 2 base url to $MAGENTO_BASE_URL"
     /usr/bin/php ./bin/magento setup:store-config:set --base-url="$MAGENTO_BASE_URL"
-    /usr/bin/php ./bin/magento setup:store-config:set --base-url-secure="$MAGENTO_BASE_URL"
     /usr/bin/php ./bin/magento cache:flush
     echo "It appears Magento is already installed (app/etc/config.php or app/etc/env.php exist). Exiting setup..."
     exit
